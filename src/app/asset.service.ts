@@ -3,13 +3,25 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import * as cloneDeep from 'lodash.clonedeep';
+
+const SCENARIOS_DIR = {
+  en: './assets/scenarios.json',
+  ko: './assets/scenarios.ko.json'
+}
+
 @Injectable()
 export class AssetService {
   private defaultScenariosJSON: any;
   constructor(private http: HttpClient) { }
   public getScenariosJSON(): Observable<any> {
     const encodedTree = localStorage.getItem('gloomhavenScenarioTree');
-    return this.http.get<any>('./assets/scenarios.json').pipe(
+    const language =
+      localStorage.getItem("language") ||
+      (window.navigator.language &&
+        window.navigator.language.substring(0, 2)) ||
+      "en";
+
+    return this.http.get<any>(SCENARIOS_DIR[language]).pipe(
       map(scenarios => {
         // First sort the nodes so that any ui using them keeps order consistent
         scenarios.nodes = scenarios.nodes.sort((n1, n2) => +n1.data.id - +n2.data.id);
